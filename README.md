@@ -90,27 +90,37 @@ Run with: `docker-compose up -d`
 - ✅ Lightweight Alpine-based image
 - ✅ Auto-restart on failure
 
-## GitHub Pages Deployment
+## 🏗️ Build from Source
 
-The app automatically deploys to GitHub Pages on push to `main` branch.
-
-### Setup:
-
-1. Go to repository Settings → Pages
-2. Set Source to "GitHub Actions"
-3. Add your TMDb API key to Settings → Secrets → Actions:
-   - Name: `VITE_TMDB_API_KEY`
-   - Value: Your TMDb API key
-
-Your app will be live at: `https://bxtgeek.github.io/SaveTheMovie/`
-
-## Build
+For manual deployment or custom hosting:
 
 ```bash
+# Install dependencies
+npm install
+
+# Build for production
 npm run build
+
+# The production files will be in the 'dist' folder
+# Serve with any static file server (Nginx, Apache, etc.)
+
+# Preview the build locally
 npm run preview
 ```
 
 ## Repository
 
-https://github.com/BxtGeek/SaveTheMovie
+**GitHub:** https://github.com/BxtGeek/SaveTheMovie
+
+---
+
+## ⭐ Support
+
+If you like SaveTheMovie, please **star the repository** to show your support!
+
+Have suggestions or ideas for improvement? Feel free to:
+- 🐛 [Open an issue](https://github.com/BxtGeek/SaveTheMovie/issues)
+- 💡 Share your feedback
+- 🤝 Contribute via pull requests
+
+Your feedback helps make SaveTheMovie better for the homelab community!
