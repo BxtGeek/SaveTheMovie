@@ -1,8 +1,15 @@
 {
-  "name": "movie-bookmark",
+  "name": "savethemovie",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "license": "MIT",
+  "description": "A self-hosted movie tracking web application for homelabs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BxtGeek/SaveTheMovie.git"
+  },
+  "author": "BxtGeek",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

@@ -124,3 +124,9 @@ Have suggestions or ideas for improvement? Feel free to:
 - 🤝 Contribute via pull requests
 
 Your feedback helps make SaveTheMovie better for the homelab community!
+
+## 📄 License
+
+MIT License - feel free to use, modify, and distribute this project for personal or commercial use.
+
+See [LICENSE](LICENSE) for details.
