@@ -1,6 +1,18 @@
 # 🎬 SaveTheMovie
 
-A minimal, modern movie bookmarking web application built with React, TypeScript, and Tailwind CSS.
+A minimal, modern, self-hosted movie tracking web application built with React, TypeScript, and Tailwind CSS. Perfect for homelabs and personal movie management.
+
+![SaveTheMovie Screenshot](.github/screenshot.png)
+
+## 🏠 Homelab Ready
+
+SaveTheMovie is designed as a **self-hosted solution** for tracking your personal movie collection. Deploy it on your homelab with Docker, run it locally, or host it anywhere you want — your data stays with you via localStorage.
+
+**Ideal for:**
+- 🏡 Homelab enthusiasts
+- 🎥 Movie collectors & trackers
+- 🔒 Privacy-focused users who want local data storage
+- 🚀 Self-hosting advocates
 
 ## Features
 
@@ -8,8 +20,9 @@ A minimal, modern movie bookmarking web application built with React, TypeScript
 - **Trending** — See trending movies on the homepage
 - **Watchlist** — Save movies you want to watch
 - **Watched** — Track movies you've already seen
-- **Persistent** — Your lists are saved to localStorage
+- **Persistent** — Your lists are saved to localStorage (local, private data)
 - **Fira Code Font** — Beautiful monospace Nerd Font
+- **Dark Theme** — Easy on the eyes during late-night browsing
 
 ## Tech Stack
 
@@ -41,17 +54,41 @@ The app works without an API key using sample movie data. To use real movie data
    VITE_TMDB_API_KEY=your_api_key_here
    ```
 
-## Docker
+## 🐳 Self-Hosting with Docker
+
+The easiest way to self-host SaveTheMovie in your homelab:
 
 ```bash
 # Build the Docker image
 docker build -t savethemovie .
 
 # Run the container
-docker run -p 8080:80 savethemovie
+docker run -d -p 8080:80 --name savethemovie savethemovie
 
-# Access at http://localhost:8080
+# Access at http://localhost:8080 or http://your-server-ip:8080
 ```
+
+**Docker Compose (recommended for homelab):**
+
+```yaml
+version: '3.8'
+services:
+  savethemovie:
+    build: .
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    container_name: savethemovie
+```
+
+Run with: `docker-compose up -d`
+
+**Features:**
+- ✅ Production-optimized Nginx server
+- ✅ Gzip compression enabled
+- ✅ Security headers configured
+- ✅ Lightweight Alpine-based image
+- ✅ Auto-restart on failure
 
 ## GitHub Pages Deployment
 

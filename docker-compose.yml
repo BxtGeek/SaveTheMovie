@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  savethemovie:
+    build: .
+    container_name: savethemovie
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
