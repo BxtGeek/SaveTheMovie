@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   savethemovie:
-    build: .
+    build:
+      context: .
+      args:
+        - VITE_TMDB_API_KEY=${VITE_TMDB_API_KEY}
     container_name: savethemovie
     ports:
       - "8080:80"

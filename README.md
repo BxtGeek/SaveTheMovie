@@ -58,30 +58,35 @@ The app works without an API key using sample movie data. To use real movie data
 
 The easiest way to self-host SaveTheMovie in your homelab:
 
-```bash
-# Build the Docker image
-docker build -t savethemovie .
+### Docker Compose (Recommended)
 
-# Run the container
-docker run -d -p 8080:80 --name savethemovie savethemovie
+```bash
+# Set your TMDb API key (optional - works without it)
+export VITE_TMDB_API_KEY=your_api_key_here
+
+# Or create a .env file with:
+# VITE_TMDB_API_KEY=your_api_key_here
+
+# Run with Docker Compose
+docker-compose up -d
 
 # Access at http://localhost:8080 or http://your-server-ip:8080
 ```
 
-**Docker Compose (recommended for homelab):**
+### Docker CLI
 
-```yaml
-version: '3.8'
-services:
-  savethemovie:
-    build: .
-    ports:
-      - "8080:80"
-    restart: unless-stopped
-    container_name: savethemovie
+```bash
+# Build with API key
+docker build --build-arg VITE_TMDB_API_KEY=your_api_key_here -t savethemovie .
+
+# Or build without API key (uses sample data)
+docker build -t savethemovie .
+
+# Run the container
+docker run -d -p 8080:80 --name savethemovie savethemovie
 ```
 
-Run with: `docker-compose up -d`
+**Note:** The API key is baked into the build at build-time. If you change your API key, rebuild the image.
 
 **Features:**
 - ✅ Production-optimized Nginx server
