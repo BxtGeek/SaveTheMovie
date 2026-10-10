@@ -1,34 +1,37 @@
 {
-  "name": "savethemovie",
+  "name": "stash",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-  "description": "A self-hosted movie tracking web application for homelabs",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/BxtGeek/SaveTheMovie.git"
-  },
+  "description": "A self-hosted bookmarking app for movies, anime, and books",
   "author": "BxtGeek",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "concurrently -n vite,api -c blue,green \"vite\" \"tsx watch server/index.ts\"",
+    "build": "tsc -b && vite build && tsc -p tsconfig.server.json",
+    "start": "node dist-server/index.js",
     "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
+    "express": "^5.1.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/node": "^24.13.3",
+    "@types/pg": "^8.15.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
     "autoprefixer": "^10.5.4",
+    "concurrently": "^9.2.0",
     "oxlint": "^1.79.0",
     "postcss": "^8.5.26",
     "tailwindcss": "^3.4.19",
+    "tsx": "^4.20.0",
     "typescript": "~6.0.2",
     "vite": "^8.2.2"
   }

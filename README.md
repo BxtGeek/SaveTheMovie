@@ -1,117 +1,144 @@
-# 🎬 SaveTheMovie
+# 🗃️ Stash
 
-A minimal, modern, self-hosted movie tracking web application built with React, TypeScript, and Tailwind CSS. Perfect for homelabs and personal movie management.
+A self-hosted multi-media bookmark application for movies, anime, and books — designed for homelabs with TypeScript, Tailwind CSS, and real-time search. Perfect for privacy-focused users who want their data to stay local, with optional server-side API key management via a unified settings console.
 
-![SaveTheMovie Screenshot](.github/screenshot.png)
+![Stash Screenshot](.github/screenshot.png)
 
 ## 🏠 Homelab Ready
 
-SaveTheMovie is designed as a **self-hosted solution** for tracking your personal movie collection. Deploy it on your homelab with Docker, run it locally, or host it anywhere you want — your data stays with you via localStorage.
+Stash is built as a **self-hosted solution** for tracking your entire media collection across three categories: movies/TV, anime, and books. Deploy on your homelab with Docker, run locally, or host anywhere — your data stays with you via PostgreSQL.
 
 **Ideal for:**
 - 🏡 Homelab enthusiasts
-- 🎥 Movie collectors & trackers
-- 🔒 Privacy-focused users who want local data storage
+- 🎬📽️📚 Media collectors & curators
+- 🔒 Privacy-focused users (keys live server-side)
 - 🚀 Self-hosting advocates
 
 ## Features
 
-- **Search** — Find movies by title using the TMDb API (or sample data)
-- **Trending** — See trending movies on the homepage
-- **Watchlist** — Save movies you want to watch
-- **Watched** — Track movies you've already seen
-- **Persistent** — Your lists are saved to localStorage (local, private data)
-- **Fira Code Font** — Beautiful monospace Nerd Font
-- **Dark Theme** — Easy on the eyes during late-night browsing
+### **Unified Media Search**
+- **Search** — Cross-source search across movies, anime, and books (TMDb / Jikan / Google Books APIs)
+- **Trending** — Browse trending content per category (Movies & TV, Anime, Books)
+- **Persistent Storage** — Bookmarks (Watchlist/Watched) stored in PostgreSQL
+
+### **Multi-Category Organization**
+- 📽️ **Movies & TV** (TMDb API) — Genres, ratings, TV shows
+- 📺 **Anime** (Jikan API, no key required) — MAL-powered search and metadata
+- 📖 **Books** (Google Books API) — Authors, ISBN, cover art
+
+### **Smart Bookmarking**
+- **Watchlist** / **Watched** lists per media type
+- **Status toggling** (add to watchlist → mark as watched)
+- **Category-scoped views** — switch tabs to see per-type libraries
+
+### **Developer-Friendly**
+- **Settings console** — Enter API keys for movies & books (Jikan is keyless)
+- **Docker-first** — Minimal `docker-compose.yml` (Postgres + one app image)
+- **API-first** — All upstream API calls happen server-side; keys never hit the browser
+- **Type-safe** — Full TypeScript throughout
 
 ## Tech Stack
 
 - React 18 + TypeScript
 - Vite
+- Express (Node.js) backend
+- PostgreSQL for persistence
 - Tailwind CSS
-- TMDb API (with sample data fallback)
-- Docker ready
-- GitHub Pages deployment
+- TMDb, Jikan (MyAnimeList), Google Books APIs
+- Docker (one app image + one Postgres container)
 
-## Getting Started
+## Quick Start
+
+### **Docker Compose (Recommended)**
+
+```bash
+# Build and run everything
+docker compose up --build
+
+# Access at http://localhost:8080
+```
+
+Postgres boots with a `stash` database and the app connects automatically. No `.env` needed for a first run.
+
+### **From Source**
 
 ```bash
 # Install dependencies
 npm install
 
-# Start development server
+# 1) Start Postgres (or point DATABASE_URL at an existing instance)
+docker compose up -d db
+
+# 2) Start dev (Vite on :5173 + Express on :3000)
 npm run dev
+
+# Open http://localhost:5173
 ```
 
-## API Key (Optional)
+## API Keys
 
-The app works without an API key using sample movie data. To use real movie data:
+Like the original SaveTheMovie, search ships with a **sample-data fallback** so the app works before any keys are added. To unlock real data:
 
-1. Get a free API key at [TMDb](https://www.themoviedb.org/settings/api)
-2. Copy `.env.example` to `.env.local`
-3. Add your API key:
-   ```
-   VITE_TMDB_API_KEY=your_api_key_here
-   ```
+1. Open **⚙ Settings** (top nav).
+2. Paste your key(s):
+   - **TMDb API key** — for movies/TV. Get one free at [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api).
+   - **Google Books API key** (optional) — helps avoid quota limits.
+   - **Jikan API key** (optional) — reserved; Jikan is currently keyless.
+3. Keys are saved to PostgreSQL **server-side only** and persist across restarts. No rebuild required.
 
-## 🐳 Self-Hosting with Docker
+## Search Categories
 
-The easiest way to self-host SaveTheMovie in your homelab:
+Stash is organized into three top-level category tabs, plus view tabs (Search / Watchlist / Watched):
+- **Movies & TV** (🎬) — TMDb-powered
+- **Anime** (📺) — Jikan-powered (no key needed)
+- **Books** (📖) — Google Books-powered
 
-### Docker Compose (Recommended)
+Each category has:
+- A category-aware search bar
+- Trending content preview
+- Your personal Watchlist / Watched lists scoped to that category
+- A Settings console (⚙) for API keys
 
-```bash
-# Set your TMDb API key (optional - works without it)
-export VITE_TMDB_API_KEY=your_api_key_here
+## Architecture
 
-# Or create a .env file with:
-# VITE_TMDB_API_KEY=your_api_key_here
+**Frontend (React + Vite)**
+- Category-aware bookmark UI (per-type tabs)
+- Shared API client (`/api/*`) talking to Express
+- No API keys, no direct upstream calls — everything through the server
 
-# Run with Docker Compose
-docker-compose up -d
+**Backend (Express + Postgres)**
+- Single Express process serves the SPA (`dist/`) and a REST API (`/api/*`)
+- PostgreSQL stores bookmarks + settings
+- Server-side calls to TMDb / Jikan / Google Books (keys never leave the server)
 
-# Access at http://localhost:8080 or http://your-server-ip:8080
-```
+## API Layer
 
-### Docker CLI
+| Endpoint | Description |
+|---|---|
+| `GET /api/search?q=&type=movie\|anime\|book` | Search the appropriate provider |
+| `GET /api/trending?type=` | Trending per category |
+| `GET /api/bookmarks?type=` | User's bookmarks (optionally by status) |
+| `POST /api/bookmarks` | Add/update a bookmark |
+| `PATCH /api/bookmarks/status` | Toggle watchlist ↔ watched |
+| `DELETE /api/bookmarks?type=&providerId=` | Remove a bookmark |
+| `GET /api/settings` / `PUT /api/settings` | Read (masked) / update API keys |
 
-```bash
-# Build with API key
-docker build --build-arg VITE_TMDB_API_KEY=your_api_key_here -t savethemovie .
+## Verification
 
-# Or build without API key (uses sample data)
-docker build -t savethemovie .
+1. **Dev:** `docker compose up -d db`, then `npm run dev` → open http://localhost:5173. Search each category, bookmark, reload — data persists.
+2. **Settings:** open ⚙, save a TMDb key, confirm it's masked & persisted; movie search now hits real TMDb.
+3. **Prod:** `docker compose up --build` → http://localhost:8080, repeat the search → bookmark → reload flow.
+4. **Database:** `docker compose exec db psql -U postgres -d stash -c "SELECT * FROM bookmarks"`.
 
-# Run the container
-docker run -d -p 8080:80 --name savethemovie savethemovie
-```
+## Migration from SaveTheMovie
 
-**Note:** The API key is baked into the build at build-time. If you change your API key, rebuild the image.
+`Stash` is a **direct evolution** of `SaveTheMovie`:
 
-**Features:**
-- ✅ Production-optimized Nginx server
-- ✅ Gzip compression enabled
-- ✅ Security headers configured
-- ✅ Lightweight Alpine-based image
-- ✅ Auto-restart on failure
-
-## 🏗️ Build from Source
-
-For manual deployment or custom hosting:
-
-```bash
-# Install dependencies
-npm install
-
-# Build for production
-npm run build
-
-# The production files will be in the 'dist' folder
-# Serve with any static file server (Nginx, Apache, etc.)
-
-# Preview the build locally
-npm run preview
-```
+- **Movies & TV** behavior preserved (search, trending, watchlist/watched, dark theme)
+- **Two new categories** (Anime, Books) added with the same UX
+- **Settings console** replaces `.env.local` API-key management; keys now live in Postgres
+- **localStorage** removed — all data now persists in PostgreSQL
+- **Nginx removed** — Express serves the built SPA directly (fewer containers)
 
 ## Repository
 
@@ -121,14 +148,14 @@ npm run preview
 
 ## ⭐ Support
 
-If you like SaveTheMovie, please **star the repository** to show your support!
+If you like Stash, please **star the repository** to show your support!
 
 Have suggestions or ideas for improvement? Feel free to:
 - 🐛 [Open an issue](https://github.com/BxtGeek/SaveTheMovie/issues)
 - 💡 Share your feedback
 - 🤝 Contribute via pull requests
 
-Your feedback helps make SaveTheMovie better for the homelab community!
+Your feedback helps make Stash better for the homelab community!
 
 ## 📄 License
 

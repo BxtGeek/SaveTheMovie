@@ -1,14 +1,35 @@
 version: '3.8'
 
 services:
-  savethemovie:
-    build:
-      context: .
-      args:
-        - VITE_TMDB_API_KEY=${VITE_TMDB_API_KEY}
-    container_name: savethemovie
-    ports:
-      - "8080:80"
-    restart: unless-stopped
+  db:
+    image: postgres:16-alpine
     environment:
-      - NODE_ENV=production
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: stash
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d stash"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/stash
+      PORT: 3000
+      NODE_ENV: production
+    ports:
+      - "8080:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

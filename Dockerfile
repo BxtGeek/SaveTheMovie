@@ -1,35 +1,25 @@
-# Build stage
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Accept API key as build argument
-ARG VITE_TMDB_API_KEY
-ENV VITE_TMDB_API_KEY=$VITE_TMDB_API_KEY
-
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
 RUN npm ci
 
-# Copy source code
 COPY . .
-
-# Build the application
 RUN npm run build
 
-# Production stage
-FROM nginx:alpine
+FROM node:20-alpine AS runtime
 
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app
 
-# Copy built files from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+ENV NODE_ENV=production
 
-# Expose port
-EXPOSE 80
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/dist-server ./dist-server
+
+EXPOSE 3000
+
+CMD ["node", "dist-server/index.js"]
